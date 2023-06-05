@@ -1,64 +1,96 @@
-//Task1_getDistance
+//HOMEWORK2
+//Task1
 
-function getDistance(x1, y1, x2, y2) {
-  const isValidCoordinate = (num) =>
-    typeof num === "number" &&
-    !isNaN(num) &&
-    num !== Infinity &&
-    num >= -1000 &&
-    num <= 1000
-  
-  if (
-    !isValidCoordinate(x1) ||
-    !isValidCoordinate(y1) ||
-    !isValidCoordinate(x2) ||
-    !isValidCoordinate(y2)
-  ) {
-    throw new Error();
+function makeDeepCopy(obj) {
+  if (typeof obj !== "object" || obj === null) {
+    throw new Error("Invalid input. Only objects can be deep copied.")
   }
 
-  const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-  return parseFloat(distance.toFixed(2))
-}
+  let copy
 
-//Task2_switchPlaces
-
-function switchPlaces(arr) {
-  const length = arr.length
-
-  if (length === 0) {
-    return []
-  }
-
-  if (!Array.isArray(arr)) {
-    throw new Error();
-  }
-
-  const middle = Math.floor(length / 2);
-  const firstHalf = arr.slice(0, middle);
-  const secondHalf = arr.slice(middle);
-
-  return secondHalf.concat(firstHalf)
-}
-
-//Task3_getDivisors
-
-function getDivisors(number) {
-  const divisors = []
-
-  if (
-    typeof number !== "number" ||
-    number === Infinity ||
-    number === -Infinity ||
-    isNaN(number)
-  ) {
-    throw new Error();
-  }
-
-  for (let i = number; i >= 1; i--) {
-    if (number % i === 0) {
-      divisors.push(i)
+  if (Array.isArray(obj)) {
+    copy = []
+    for (let i = 0; i < obj.length; i++) {
+      copy[i] = makeDeepCopy(obj[i])
+    }
+  } else if (obj instanceof Map) {
+    copy = new Map()
+    obj.forEach((value, key) => {
+      copy.set(makeDeepCopy(key), makeDeepCopy(value))
+    })
+  } else if (obj instanceof Set) {
+    copy = new Set()
+    obj.forEach((value) => {
+      copy.add(makeDeepCopy(value))
+    })
+  } else {
+    copy = {}
+    for (let key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copy[key] = makeDeepCopy(obj[key])
+      }
     }
   }
-  return divisors
+  return copy
+}
+
+//Task2
+function createIterable(from, to) {
+  if (
+    typeof from !== "number" ||
+    typeof to !== "number" ||
+    !isFinite(from) ||
+    !isFinite(to) ||
+    from >= to
+  ) {
+    throw new Error("Invalid arguments")
+  }
+
+  return {
+    [Symbol.iterator]() {
+      let current = from
+
+      return {
+        next() {
+          if (current <= to) {
+            return { value: current++, done: false }
+          } else {
+            return { done: true }
+          }
+        },
+      }
+    },
+  }
+}
+
+// Task 3
+function createProxy(obj) {
+  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+    throw new Error()
+  }
+
+  return new Proxy(obj, {
+    get(target, prop) {
+      if (prop in target) {
+        target[prop].readAmount = (target[prop].readAmount || 0) + 1
+      }
+      return target[prop]
+    },
+    set(target, prop, value) {
+      if (!(prop in target)) {
+        target[prop] = {
+          value: value,
+          readAmount: 0,
+        }
+      } else {
+        const existingValue = target[prop].value
+        if (typeof existingValue === typeof value || existingValue === null) {
+          target[prop].value = value
+        } else {
+          throw new Error()
+        }
+      }
+      return true
+    },
+  })
 }
