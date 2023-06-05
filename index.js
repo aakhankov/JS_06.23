@@ -3,7 +3,7 @@
 
 function makeDeepCopy(obj) {
   if (typeof obj !== "object" || obj === null) {
-    throw new Error("Invalid input. Only objects can be deep copied.")
+    throw new Error()
   }
 
   let copy
@@ -43,7 +43,7 @@ function createIterable(from, to) {
     !isFinite(to) ||
     from >= to
   ) {
-    throw new Error("Invalid arguments")
+    throw new Error()
   }
 
   return {
