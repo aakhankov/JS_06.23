@@ -54,22 +54,22 @@ function bubbleSort(arr) {
 
 //Task3
 function storageWrapper(callback, arr = []) {
-  if (typeof callback !== 'function') {
-    throw new Error('Invalid argument.');
+  if (typeof callback !== "function") {
+    throw new Error("Invalid argument.")
   }
 
   if (arr && !Array.isArray(arr)) {
-    throw new Error('Invalid argument.');
+    throw new Error("Invalid argument.")
   }
 
   return function (...args) {
-    const result = callback(...args);
+    const result = callback(...args)
 
     if (arr) {
-      arr.push(result);
-      return result;
+      arr.push(result)
+      return result
     } else {
-      return arr;
+      return arr
     }
-  };
+  }
 }
