@@ -1,96 +1,75 @@
-//HOMEWORK2
+//HOMEWORK3
 //Task1
-
-function makeDeepCopy(obj) {
-  if (typeof obj !== "object" || obj === null) {
-    throw new Error()
+Array.prototype.customFilter = customFilter
+function customFilter(callback, thisArg) {
+  if (typeof callback !== "function") {
+    throw new Error("Invalid argument.")
   }
 
-  let copy
+  if (
+    thisArg !== undefined &&
+    (typeof thisArg !== "object" || thisArg === null)
+  ) {
+    throw new Error("Invalid argument.")
+  }
 
-  if (Array.isArray(obj)) {
-    copy = []
-    for (let i = 0; i < obj.length; i++) {
-      copy[i] = makeDeepCopy(obj[i])
-    }
-  } else if (obj instanceof Map) {
-    copy = new Map()
-    obj.forEach((value, key) => {
-      copy.set(makeDeepCopy(key), makeDeepCopy(value))
-    })
-  } else if (obj instanceof Set) {
-    copy = new Set()
-    obj.forEach((value) => {
-      copy.add(makeDeepCopy(value))
-    })
-  } else {
-    copy = {}
-    for (let key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        copy[key] = makeDeepCopy(obj[key])
-      }
+  const filteredArray = []
+  for (let i = 0; i < this.length; i++) {
+    if (callback.call(thisArg, this[i], i, this)) {
+      filteredArray.push(this[i])
     }
   }
-  return copy
+
+  return filteredArray
 }
 
 //Task2
-function createIterable(from, to) {
-  if (
-    typeof from !== "number" ||
-    typeof to !== "number" ||
-    !isFinite(from) ||
-    !isFinite(to) ||
-    from >= to
-  ) {
-    throw new Error()
+function bubbleSort(arr) {
+  if (!Array.isArray(arr)) {
+    throw new Error("Invalid argument.")
   }
+  function isValidNumber(value) {
+    return typeof value === "number" && isFinite(value)
+  }
+  const sortedArray = arr.slice()
 
-  return {
-    [Symbol.iterator]() {
-      let current = from
+  for (let i = 0; i < sortedArray.length - 1; i++) {
+    for (let j = 0; j < sortedArray.length - i - 1; j++) {
+      const current = sortedArray[j]
+      const next = sortedArray[j + 1]
 
-      return {
-        next() {
-          if (current <= to) {
-            return { value: current++, done: false }
-          } else {
-            return { done: true }
-          }
-        },
+      if (!isValidNumber(current) || !isValidNumber(next)) {
+        throw new Error("Invalid argument.")
       }
-    },
+
+      if (current > next) {
+        sortedArray[j] = next
+        sortedArray[j + 1] = current
+      }
+    }
   }
+
+  return sortedArray
 }
 
-// Task 3
-function createProxy(obj) {
-  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
-    throw new Error()
+//Task3
+function storageWrapper(callback, arr = []) {
+  if (typeof callback !== 'function') {
+    throw new Error('Invalid argument.');
   }
 
-  return new Proxy(obj, {
-    get(target, prop) {
-      if (prop in target) {
-        target[prop].readAmount = (target[prop].readAmount || 0) + 1
-      }
-      return target[prop]
-    },
-    set(target, prop, value) {
-      if (!(prop in target)) {
-        target[prop] = {
-          value: value,
-          readAmount: 0,
-        }
-      } else {
-        const existingValue = target[prop].value
-        if (typeof existingValue === typeof value || existingValue === null) {
-          target[prop].value = value
-        } else {
-          throw new Error()
-        }
-      }
-      return true
-    },
-  })
+  if (arr && !Array.isArray(arr)) {
+    throw new Error('Invalid argument.');
+  }
+
+  return function (...args) {
+    const result = callback(...args);
+
+    if (arr) {
+      arr.push(result);
+      return result;
+    } else {
+      return arr;
+    }
+  };
 }
