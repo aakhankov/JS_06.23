@@ -1,75 +1,74 @@
-//HOMEWORK3
+//Homework4
 //Task1
-Array.prototype.customFilter = customFilter
-function customFilter(callback, thisArg) {
-  if (typeof callback !== "function") {
-    throw new Error("Invalid argument.")
-  }
-
+function createDebounceFunction(callback, delay) {
   if (
-    thisArg !== undefined &&
-    (typeof thisArg !== "object" || thisArg === null)
+    typeof callback !== "function" ||
+    typeof delay !== "number" ||
+    !Number.isFinite(delay) ||
+    delay <= 0
   ) {
-    throw new Error("Invalid argument.")
+    throw new Error("Invalid argument")
   }
 
-  const filteredArray = []
-  for (let i = 0; i < this.length; i++) {
-    if (callback.call(thisArg, this[i], i, this)) {
-      filteredArray.push(this[i])
-    }
-  }
+  let timeoutId
 
-  return filteredArray
+  return function (...args) {
+    clearTimeout(timeoutId)
+
+    timeoutId = setTimeout(() => {
+      callback.apply(null, args)
+    }, delay)
+  }
 }
 
 //Task2
-function bubbleSort(arr) {
-  if (!Array.isArray(arr)) {
-    throw new Error("Invalid argument.")
-  }
-  function isValidNumber(value) {
-    return typeof value === "number" && isFinite(value)
-  }
-  const sortedArray = arr.slice()
-
-  for (let i = 0; i < sortedArray.length - 1; i++) {
-    for (let j = 0; j < sortedArray.length - i - 1; j++) {
-      const current = sortedArray[j]
-      const next = sortedArray[j + 1]
-
-      if (!isValidNumber(current) || !isValidNumber(next)) {
-        throw new Error("Invalid argument.")
-      }
-
-      if (current > next) {
-        sortedArray[j] = next
-        sortedArray[j + 1] = current
-      }
+class RickAndMorty {
+  getCharacter(id) {
+    if (
+      typeof id !== "number" ||
+      isNaN(id) ||
+      !Number.isInteger(id) ||
+      id < 0
+    ) {
+      throw new Error("Invalid character id")
     }
+
+    return fetch(`https://rickandmortyapi.com/api/character/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          throw new Error(data.error)
+        } else {
+          return data
+        }
+      })
+      .catch((error) => {
+        return null
+      })
   }
 
-  return sortedArray
-}
+  async getEpisode(id) {
+    if (
+      typeof id !== "number" ||
+      isNaN(id) ||
+      !Number.isInteger(id) ||
+      id < 0
+    ) {
+      throw new Error("Invalid episode id")
+    }
 
-//Task3
-function storageWrapper(callback, arr = []) {
-  if (typeof callback !== "function") {
-    throw new Error("Invalid argument.")
-  }
-
-  if (arr && !Array.isArray(arr)) {
-    throw new Error("Invalid argument.")
-  }
-
-  return function (...args) {
-    const result = callback(...args)
-
-    if (arr) {
-      arr.push(result)
-      return result
-    } else {
-      return arr
+    try {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/episode/${id}`
+      )
+      const data = await response.json()
+      if (data.error) {
+        throw new Error(data.error)
+      } else {
+        return data
+      }
+    } catch (error) {
+      return null
     }
   }
 }
