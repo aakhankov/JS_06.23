@@ -1,351 +1,206 @@
-//Homework5
+let notes = []
 
-//Task1 Stack
-class Stack {
-  constructor(limit = 10) {
-    if (typeof limit !== "number" || !Number.isFinite(limit) || limit <= 0) {
-      throw new Error("Invalid limit value")
-    }
-    this.limit = limit
-    this.stack = []
+function validateInput(inputElement, minLength, maxLength) {
+  const inputValue = inputElement.value.trim()
+  const inputRegex = new RegExp(`^.{${minLength},${maxLength}}$`)
+
+  if (inputValue === "") {
+    inputElement.style.backgroundColor = "red"
+    return false
   }
 
-  push(elem) {
-    if (this.stack.length >= this.limit) {
-      throw new Error("Limit exceeded")
-    }
-    this.stack.push(elem)
+  if (!inputRegex.test(inputValue)) {
+    inputElement.style.backgroundColor = "red"
+    return false
   }
 
-  pop() {
-    if (this.isEmpty()) {
-      throw new Error("Empty stack")
-    }
-    return this.stack.pop()
-  }
+  inputElement.style.backgroundColor = "" // Reset the background color
+  return true
+}
 
-  peek() {
-    if (this.isEmpty()) {
-      return null
-    }
-    return this.stack[this.stack.length - 1]
+function getCurrentDateTime() {
+  const now = new Date()
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
   }
+  return now.toLocaleDateString("en-US", options)
+}
 
-  isEmpty() {
-    return this.stack.length === 0
-  }
+function saveNotes() {
+  localStorage.setItem("notes", JSON.stringify(notes))
+}
 
-  toArray() {
-    return [...this.stack]
-  }
-
-  static fromIterable(iterable) {
-    if (typeof iterable[Symbol.iterator] !== "function") {
-      throw new Error("Not iterable")
-    }
-    const stack = new Stack(iterable.length)
-    for (const elem of iterable) {
-      stack.push(elem)
-    }
-    return stack
+function loadNotes() {
+  const savedNotes = localStorage.getItem("notes")
+  if (savedNotes) {
+    notes = JSON.parse(savedNotes)
   }
 }
 
-//Task2 LinkedList
-class LinkedList {
-  constructor() {
-    this.head = null
-    this.tail = null
+function renderNotes() {
+  const notesContainer = document.getElementById("notes")
+  notesContainer.innerHTML = ""
+
+  notes.forEach((note, index) => {
+    const noteElement = createNoteElement(note, index)
+    notesContainer.appendChild(noteElement)
+  })
+}
+
+function addNote() {
+  const titleInput = document.getElementById("titleInput")
+  const textInput = document.getElementById("textInput")
+  const colorSelect = document.getElementById("colorSelect")
+
+  if (!validateInput(titleInput, 5, 15) || !validateInput(textInput, 5, 100)) {
+    return
   }
 
-  append(elem) {
-    const newNode = {
-      value: elem,
-      next: null,
-    }
+  const title = titleInput.value.trim()
+  const text = textInput.value.trim()
+  const color = colorSelect.value
 
-    if (!this.head) {
-      this.head = newNode
-      this.tail = newNode
-    } else {
-      this.tail.next = newNode
-      this.tail = newNode
-    }
+  const note = {
+    title: title,
+    text: text,
+    createdDate: getCurrentDateTime(),
+    updated: false,
+    color: color,
   }
 
-  prepend(elem) {
-    const newNode = {
-      value: elem,
-      next: null,
-    }
+  notes.push(note)
+  saveNotes()
+  renderNotes()
 
-    if (!this.head) {
-      this.head = newNode
-      this.tail = newNode
-    } else {
-      newNode.next = this.head
-      this.head = newNode
-    }
-  }
+  titleInput.value = ""
+  textInput.value = ""
+  titleInput.focus()
+}
 
-  find(elem) {
-    let currentNode = this.head
-
-    while (currentNode) {
-      if (currentNode.value === elem) {
-        return currentNode
-      }
-      currentNode = currentNode.next
-    }
-
-    return null
-  }
-
-  toArray() {
-    const arr = []
-    let currentNode = this.head
-
-    while (currentNode) {
-      arr.push(currentNode.value)
-      currentNode = currentNode.next
-    }
-
-    return arr
-  }
-
-  static fromIterable(iterable) {
-    if (typeof iterable[Symbol.iterator] !== "function") {
-      throw new Error("Not iterable")
-    }
-
-    const linkedList = new LinkedList()
-
-    for (const item of iterable) {
-      linkedList.append(item)
-    }
-
-    return linkedList
+function deleteNote(index) {
+  const confirmDelete = confirm("Are you sure you want to delete this note?")
+  if (confirmDelete) {
+    notes.splice(index, 1)
+    saveNotes()
+    renderNotes()
   }
 }
 
-//Task3 Car
-class Car {
-  #brand = ""
-  get brand() {
-    return this.#brand
-  }
+function searchNotes() {
+  const searchInput = document.getElementById("searchInput")
+  const searchTerm = searchInput.value.toLowerCase()
 
-  set brand(value) {
-    if (typeof value !== "string" || value.length < 1 || value.length > 50) {
-      throw new Error("Invalid brand name")
-    }
-    this.#brand = value
-  }
+  const filteredNotes = notes.filter((note) => {
+    return note.title.toLowerCase().includes(searchTerm)
+  })
 
-  #model = ""
-  get model() {
-    return this.#model
-  }
+  const notesContainer = document.getElementById("notes")
+  notesContainer.innerHTML = ""
 
-  set model(value) {
-    if (typeof value !== "string" || value.length < 1 || value.length > 50) {
-      throw new Error("Invalid model name")
-    }
-    this.#model = value
-  }
-
-  #yearOfManufacturing = 1950
-  get yearOfManufacturing() {
-    return this.#yearOfManufacturing
-  }
-
-  set yearOfManufacturing(value) {
-    const currentYear = new Date().getFullYear()
-    if (
-      typeof value !== "number" ||
-      !Number.isInteger(value) ||
-      value < 1950 ||
-      value > currentYear
-    ) {
-      throw new Error("Invalid year of manufacturing")
-    }
-    this.#yearOfManufacturing = value
-  }
-
-  #maxSpeed = 100
-  get maxSpeed() {
-    return this.#maxSpeed
-  }
-
-  set maxSpeed(value) {
-    if (
-      typeof value !== "number" ||
-      !Number.isInteger(value) ||
-      value < 100 ||
-      value > 330
-    ) {
-      throw new Error("Invalid max speed")
-    }
-    this.#maxSpeed = value
-  }
-
-  #maxFuelVolume = 20
-  get maxFuelVolume() {
-    return this.#maxFuelVolume
-  }
-
-  set maxFuelVolume(value) {
-    if (
-      typeof value !== "number" ||
-      !Number.isInteger(value) ||
-      value < 20 ||
-      value > 100
-    ) {
-      throw new Error("Invalid max fuel volume")
-    }
-    this.#maxFuelVolume = value
-  }
-
-  #fuelConsumption = 1
-  get fuelConsumption() {
-    return this.#fuelConsumption
-  }
-
-  set fuelConsumption(value) {
-    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
-      throw new Error("Invalid fuel consumption")
-    }
-    this.#fuelConsumption = value
-  }
-
-  #damage = 1
-  get damage() {
-    return this.#damage
-  }
-
-  set damage(value) {
-    if (
-      typeof value !== "number" ||
-      !Number.isInteger(value) ||
-      value < 1 ||
-      value > 5
-    ) {
-      throw new Error("Invalid damage")
-    }
-    this.#damage = value
-  }
-
-  #currentFuelVolume = 0
-  get currentFuelVolume() {
-    return this.#currentFuelVolume
-  }
-
-  #isStarted = false
-  get isStarted() {
-    return this.#isStarted
-  }
-
-  #mileage = 0
-  get mileage() {
-    return this.#mileage
-  }
-
-  #health = 100
-  get health() {
-    return this.#health
-  }
-
-  start() {
-    if (this.#isStarted) {
-      throw new Error("Car has already started")
-    }
-    this.#isStarted = true
-  }
-
-  shutDownEngine() {
-    if (!this.#isStarted) {
-      throw new Error("Car hasn't started yet")
-    }
-    this.#isStarted = false
-  }
-
-  fillUpGasTank(fuelAmount) {
-    if (
-      typeof fuelAmount !== "number" ||
-      !Number.isFinite(fuelAmount) ||
-      !Number.isInteger(fuelAmount) ||
-      fuelAmount <= 0
-    ) {
-      throw new Error("Invalid fuel amount")
-    }
-
-    if (this.#currentFuelVolume + fuelAmount > this.#maxFuelVolume) {
-      throw new Error("Too much fuel")
-    }
-
-    if (this.#isStarted) {
-      throw new Error("You have to shut down your car first")
-    }
-
-    this.#currentFuelVolume += fuelAmount
-  }
-
-  drive(speed, duration) {
-    if (
-      typeof speed !== "number" ||
-      !Number.isFinite(speed) ||
-      !Number.isInteger(speed) ||
-      speed <= 0
-    ) {
-      throw new Error("Invalid speed")
-    }
-
-    if (
-      typeof duration !== "number" ||
-      !Number.isFinite(duration) ||
-      !Number.isInteger(duration) ||
-      duration <= 0
-    ) {
-      throw new Error("Invalid duration")
-    }
-
-    if (speed > this.#maxSpeed) {
-      throw new Error("Car can't go this fast")
-    }
-
-    if (!this.#isStarted) {
-      throw new Error("You have to start your car first")
-    }
-
-    const requiredFuel = (speed / 100) * this.#fuelConsumption * duration
-    const requiredHealth = (speed / 100) * this.#damage * duration
-
-    if (requiredFuel > this.#currentFuelVolume) {
-      throw new Error("You don't have enough fuel")
-    }
-
-    if (requiredHealth > this.#health) {
-      throw new Error("Your car won't make it")
-    }
-
-    this.#currentFuelVolume -= requiredFuel
-    this.#health -= requiredHealth
-    this.#mileage += speed * duration
-  }
-
-  repair() {
-    if (this.#isStarted) {
-      throw new Error("You have to shut down your car first")
-    }
-
-    if (this.#currentFuelVolume < this.#maxFuelVolume) {
-      throw new Error("You have to fill up your gas tank first")
-    }
-
-    this.#health = 100
-  }
-
-  getFullAmount() {
-    return this.#maxFuelVolume - this.#currentFuelVolume
-  }
+  filteredNotes.forEach((note, index) => {
+    const noteElement = createNoteElement(note, index)
+    notesContainer.appendChild(noteElement)
+  })
 }
+
+function createNoteElement(note, index) {
+  const noteElement = document.createElement("div")
+  noteElement.classList.add("note")
+  noteElement.style.backgroundColor = note.color
+  noteElement.id = `note-${index}`
+
+  const titleElement = document.createElement("h3")
+  titleElement.innerText = note.title
+  titleElement.classList.add("note-title")
+
+  const textElement = document.createElement("p")
+  textElement.innerText = note.text
+  textElement.classList.add("note-text")
+
+  const dateElement = document.createElement("p")
+  dateElement.innerText = note.updated
+    ? `Updated ${note.createdDate}`
+    : note.createdDate
+  dateElement.classList.add("note-date")
+
+  const updateButton = document.createElement("button")
+  updateButton.innerHTML = '<i class="fa fa-edit"> Edit</i>'
+  updateButton.classList.add("update-button")
+  updateButton.addEventListener("click", () => {
+    editNoteElement(note, index)
+  })
+
+  const deleteButton = document.createElement("button")
+  deleteButton.innerHTML = '<i class="fa fa-trash"> Delete</i>'
+  deleteButton.classList.add("delete-button")
+  deleteButton.addEventListener("click", () => {
+    deleteNote(index)
+  })
+
+  noteElement.appendChild(titleElement)
+  noteElement.appendChild(textElement)
+  noteElement.appendChild(dateElement)
+  noteElement.appendChild(deleteButton)
+  noteElement.appendChild(updateButton)
+
+  return noteElement
+}
+
+function editNoteElement(note, index) {
+  const noteElement = document.getElementById(`note-${index}`)
+
+  const titleElement = document.createElement("input")
+  titleElement.type = "text"
+  titleElement.value = note.title
+  titleElement.classList.add("note-title-input")
+
+  const textElement = document.createElement("textarea")
+  textElement.value = note.text
+  textElement.classList.add("note-textarea")
+
+  const confirmButton = document.createElement("button")
+  confirmButton.innerHTML = '<i class="fa fa-check"> Confirm</i>'
+  confirmButton.classList.add("confirm-button")
+  confirmButton.addEventListener("click", () => {
+    const updatedTitle = titleElement.value.trim()
+    const updatedText = textElement.value.trim()
+
+    if (
+      !validateInput(titleElement, 5, 15) ||
+      !validateInput(textElement, 5, 100)
+    ) {
+      return
+    }
+
+    note.title = updatedTitle
+    note.text = updatedText
+    note.updated = true
+    note.createdDate = getCurrentDateTime()
+
+    saveNotes()
+    renderNotes()
+  })
+
+  const cancelButton = document.createElement("button")
+  cancelButton.innerHTML = '<i class="fa fa-times"> Cancel</i>'
+  cancelButton.classList.add("cancel-button")
+  cancelButton.addEventListener("click", () => {
+    renderNotes()
+  })
+
+  noteElement.innerHTML = ""
+  noteElement.appendChild(titleElement)
+  noteElement.appendChild(textElement)
+  noteElement.appendChild(confirmButton)
+  noteElement.appendChild(cancelButton)
+}
+
+document.getElementById("addButton").addEventListener("click", addNote)
+document.getElementById("searchInput").addEventListener("input", searchNotes)
+
+loadNotes()
+renderNotes()

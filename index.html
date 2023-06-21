@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note App</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Note App</h1>
+      <div class="note-creation">
+        <h2>Create a Note</h2>
+        <input
+          type="text"
+          id="titleInput"
+          placeholder="Enter title (5-15 characters)"
+        />
+        <textarea
+          id="textInput"
+          placeholder="Enter text (5-100 characters)"
+        ></textarea>
+        <select id="colorSelect">
+          <option value="#ffd7d0">Pink</option>
+          <option value="#f0b296">Sand</option>
+          <option value="#bfec59">Green</option>
+          <option value="#4892d0">Blue</option>
+          <option value="#e5dbf8">Purple</option>
+        </select>
+        <button id="addButton">Add New Note</button>
+      </div>
+      <div class="search">
+        <h2>Search Notes</h2>
+        <input type="text" id="searchInput" placeholder="Search by title" />
+      </div>
+      <div class="note-list">
+        <h2>Note List</h2>
+        <div id="notes"></div>
+      </div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>

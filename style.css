@@ -1,0 +1,137 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+h2 {
+  margin: 10px 0;
+}
+
+.note-creation input,
+.note-creation textarea {
+  width: 97%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.note-creation select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.note-creation button {
+  padding: 10px 20px;
+  background-color: #599b69;
+  color: #fff;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.note-list .note {
+  padding: 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #eee;
+  border: 1px solid;
+}
+
+.note-list .note h3 {
+  margin: 0;
+  border-bottom: #333 solid;
+}
+
+.note-list .note p {
+  margin: 10px 0;
+}
+
+.note-list .note .note-date {
+  font-size: 12px;
+  color: #888;
+}
+
+.note-list .note button {
+  padding: 5px;
+  margin-right: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100px;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.search {
+  background-color: #ccc;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid;
+}
+
+.search input {
+  width: 97%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.search button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.note-title-input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+.note-textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.note {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.note-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.note-text {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.note-date {
+  font-size: 12px;
+  color: gray;
+}
